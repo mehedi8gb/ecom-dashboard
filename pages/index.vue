@@ -59,13 +59,13 @@
             </div>
           </form>
 
-          <!-- New Go to Dashboard Button -->
+          <!-- New Go to Dashboard Button 
           <button
             @click="handleLogin"
             class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 relative overflow-hidden transition-all duration-300 mt-4"
           >
             Go to Dashboard
-          </button>
+          </button>-->
 
           <!-- Social Login Buttons -->
           <div class="mt-6 space-y-4">
@@ -116,16 +116,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/store/modules/auth'
 
-definePageMeta({
-  requiresAuth: true, // Or any other condition to protect the route
-})
 
-useSeoMeta({
-  title: 'Login | Your E-commerce',
-  description: 'Login to your account',
-  image: 'https://example.com/image.jpg',
-  //url: 'https://example.com/login',
-})
 
 const email = ref('mehidy.gb@gmail.com')
 const password = ref('12345678')

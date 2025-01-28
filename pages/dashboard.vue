@@ -11,28 +11,24 @@
 
       <!-- Search Bar -->
       <div class="px-4 mt-6">
-        <input
-          v-model="searchQuery"
-          type="search"
-          placeholder="Search in menu"
-          class="w-full px-4 py-2 bg-gray-800 rounded-md text-sm"
-        />
+        <input v-model="searchQuery" type="search" placeholder="Search in menu"
+          class="w-full px-4 py-2 bg-gray-800 rounded-md text-sm" />
       </div>
 
       <!-- Menu Items -->
       <nav class="mt-6">
         <template v-for="(item, index) in filteredMenuItems" :key="index">
-          <router-link
-            :to="item.path"
-            class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800"
-            :class="{ 'bg-gray-800': item.active }"
-          >
+          <router-link :to="item.path" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800"
+            :class="{ 'bg-gray-800': item.active }">
             <component :is="item.icon" class="w-5 h-5 mr-3" />
             {{ item.name }}
           </router-link>
         </template>
       </nav>
     </aside>
+    <!--till this sidebar-->
+
+
 
     <!-- Main Content -->
     <main class="flex-1 overflow-auto">
@@ -61,17 +57,40 @@
 
       <!-- Dashboard Content -->
       <div class="p-6">
+
+
         <!-- Stats Grid -->
         <div class="grid grid-cols-4 gap-6 mb-6">
-          <div v-for="stat in stats" :key="stat.title" class="bg-white p-6 rounded-lg shadow-sm">
-            <h3 class="text-4xl font-bold mb-1">{{ stat.value }}</h3>
-            <p class="text-gray-500 text-sm">{{ stat.title }}</p>
-          </div>
+          <!-- Total Customer -->
+          <router-link to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+            <h3 class="text-4xl font-bold mb-1">{{ stats[0].value }}</h3>
+            <p class="text-gray-500 text-sm">{{ stats[0].title }}</p>
+          </router-link>
+
+          <!-- Total Products -->
+          <router-link to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+            <h3 class="text-4xl font-bold mb-1">{{ stats[1].value }}</h3>
+            <p class="text-gray-500 text-sm">{{ stats[1].title }}</p>
+          </router-link>
+
+          <!-- Total Sales -->
+          <router-link to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+            <h3 class="text-4xl font-bold mb-1">{{ stats[2].value }}</h3>
+            <p class="text-gray-500 text-sm">{{ stats[2].title }}</p>
+          </router-link>
+
+          <!-- Total Sellers -->
+          <router-link to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+            <h3 class="text-4xl font-bold mb-1">{{ stats[3].value }}</h3>
+            <p class="text-gray-500 text-sm">{{ stats[3].title }}</p>
+          </router-link>
         </div>
+
+
 
         <!-- Categories and Brands Section -->
         <div class="grid grid-cols-2 gap-6 mb-6">
-          <div class="bg-white p-6 rounded-lg shadow-sm">
+          <router-link to="/categories" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="font-semibold mb-4">Total Category</h3>
             <div class="space-y-3">
               <div v-for="category in categories" :key="category.name" class="flex justify-between">
@@ -79,8 +98,9 @@
                 <span>${{ category.value.toLocaleString() }}</span>
               </div>
             </div>
-          </div>
-          <div class="bg-white p-6 rounded-lg shadow-sm">
+          </router-link>
+
+          <router-link to="/brands" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="font-semibold mb-4">Top Brands</h3>
             <div class="space-y-3">
               <div v-for="brand in brands" :key="brand.name" class="flex justify-between">
@@ -88,25 +108,28 @@
                 <span>${{ brand.value.toLocaleString() }}</span>
               </div>
             </div>
-          </div>
+          </router-link>
         </div>
 
         <!-- Orders Stats -->
         <div class="grid grid-cols-3 gap-6">
-          <div class="bg-white p-6 rounded-lg shadow-sm">
+          <router-link to="orders-stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="text-4xl font-bold text-purple-500 mb-2">153</h3>
             <p class="text-gray-500 mb-4">Total Order</p>
             <button class="w-full mt-4 bg-purple-500 text-white py-2 rounded-md hover:bg-purple-600">
               All Orders
             </button>
-          </div>
+          </router-link>
+
           <div class="col-span-2 bg-white p-6 rounded-lg shadow-sm">
-            <h3 class="font-semibold">Sales this month</h3>
-            <div class="h-64 flex items-end justify-between">
-              <div v-for="i in 12" :key="i" class="w-8">
-                <div class="bg-blue-500 h-32" :style="{ height: `${Math.random() * 100}%` }"></div>
+            <router-link to="/sales_current_month" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+              <h3 class="font-semibold">Sales this month</h3>
+              <div class="h-64 flex items-end justify-between">
+                <div v-for="i in 12" :key="i" class="w-8">
+                  <div class="bg-blue-500 h-32" :style="{ height: `${Math.random() * 100}%` }"></div>
+                </div>
               </div>
-            </div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -125,7 +148,7 @@ const stats = [
   { title: 'Total Customer', value: '15' },
   { title: 'Total Products', value: '178' },
   { title: 'Total Sales', value: '6.9K' },
-  { title: 'Total sellers', value: '10' },
+  { title: 'Total sellers', value: '100' },
 ];
 
 const categories = [
