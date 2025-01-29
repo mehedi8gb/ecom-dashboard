@@ -28,8 +28,6 @@
     </aside>
     <!--till this sidebar-->
 
-
-
     <!-- Main Content -->
     <main class="flex-1 overflow-auto">
       <!-- Header -->
@@ -57,36 +55,32 @@
 
       <!-- Dashboard Content -->
       <div class="p-6">
-
-
         <!-- Stats Grid -->
         <div class="grid grid-cols-4 gap-6 mb-6">
           <!-- Total Customer -->
-          <router-link to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+          <router-link v-if="stats.length > 0" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="text-4xl font-bold mb-1">{{ stats[0].value }}</h3>
             <p class="text-gray-500 text-sm">{{ stats[0].title }}</p>
           </router-link>
 
           <!-- Total Products -->
-          <router-link to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+          <router-link v-if="stats.length > 1" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="text-4xl font-bold mb-1">{{ stats[1].value }}</h3>
             <p class="text-gray-500 text-sm">{{ stats[1].title }}</p>
           </router-link>
 
           <!-- Total Sales -->
-          <router-link to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+          <router-link v-if="stats.length > 2" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="text-4xl font-bold mb-1">{{ stats[2].value }}</h3>
             <p class="text-gray-500 text-sm">{{ stats[2].title }}</p>
           </router-link>
 
           <!-- Total Sellers -->
-          <router-link to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+          <router-link v-if="stats.length > 3" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="text-4xl font-bold mb-1">{{ stats[3].value }}</h3>
             <p class="text-gray-500 text-sm">{{ stats[3].title }}</p>
           </router-link>
         </div>
-
-
 
         <!-- Categories and Brands Section -->
         <div class="grid grid-cols-2 gap-6 mb-6">
@@ -121,16 +115,30 @@
             </button>
           </router-link>
 
-          <div class="col-span-2 bg-white p-6 rounded-lg shadow-sm">
-            <router-link to="/sales_current_month" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
-              <h3 class="font-semibold">Sales this month</h3>
-              <div class="h-64 flex items-end justify-between">
-                <div v-for="i in 12" :key="i" class="w-8">
-                  <div class="bg-blue-500 h-32" :style="{ height: `${Math.random() * 100}%` }"></div>
+          <template>
+            <div class="grid grid-cols-2 gap-6 mb-6">
+              <!-- Real-time Pie Chart with Sales Breakdown -->
+              <div class="col-span-2 bg-white p-6 rounded-lg shadow-sm">
+                <h3 class="font-semibold mb-4">
+                  Sales Distribution for This Month
+                </h3>
+                <canvas ref="chartCanvas"></canvas>
+
+                <div class="mt-4">
+                  <p>
+                    <strong>Total Sales for This Month:</strong> ${{
+                      thisMonthTotal
+                    }}
+                  </p>
+                  <p>
+                    <strong>Total Sales for Previous Month:</strong> ${{
+                      previousMonthTotal
+                    }}
+                  </p>
                 </div>
               </div>
-            </router-link>
-          </div>
+            </div>
+          </template>
         </div>
       </div>
     </main>
@@ -138,47 +146,118 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { Menu, Plus, FileText, CheckCircle } from 'lucide-vue-next';
-import { useRouter } from 'vue-router';
+import { ref, computed } from "vue";
+import { Menu, Plus, FileText, CheckCircle } from "lucide-vue-next";
+import { useRouter } from "vue-router";
+import { onMounted } from "vue";
+import Chart from "chart.js/auto";
 
 const router = useRouter();
 
-const stats = [
-  { title: 'Total Customer', value: '15' },
-  { title: 'Total Products', value: '178' },
-  { title: 'Total Sales', value: '6.9K' },
-  { title: 'Total sellers', value: '100' },
-];
+const stats = ref([]);
 
-const categories = [
-  { name: 'Computer & Accessories', value: 2447110 },
-  { name: 'Men Clothing & Fashion', value: 1901550 },
-  { name: 'Cellphones & Tabs', value: 1494000 },
-];
+onMounted(() => {
+  const storedStats = localStorage.getItem("stats");
+  stats.value = storedStats ? JSON.parse(storedStats) : [];
+});
 
-const brands = [
-  { name: 'Samsung', value: 2008000 },
-  { name: 'Nike', value: 983600 },
-];
+const categories = ref([]);
+
+onMounted(() => {
+  const storedCategories = localStorage.getItem("categories");
+  categories.value = storedCategories ? JSON.parse(storedCategories) : [];
+});
+
+const brands = ref([]);
+onMounted(() => {
+  const storedBrands = localStorage.getItem("brands");
+  brands.value = storedBrands ? JSON.parse(storedBrands) : [];
+});
 
 const menuItems = [
-  { name: 'Dashboard', path: '/dashboard', icon: 'LayoutDashboard', active: true },
-  { name: 'POS System', path: '/pos-system', icon: 'CreditCard' },
-  { name: 'Products', path: '/products', icon: 'Package' },
-  { name: 'Orders', path: '/orders', icon: 'ShoppingCart' },
-  { name: 'Customers', path: '/customers', icon: 'Users' },
-  { name: 'Reports', path: '/reports', icon: 'BarChart' },
+  {
+    name: "Dashboard",
+    path: "/dashboard",
+    icon: "LayoutDashboard",
+    active: true,
+  },
+  { name: "POS System", path: "/pos-system", icon: "CreditCard" },
+  { name: "Products", path: "/products", icon: "Package" },
+  { name: "Orders", path: "/orders", icon: "ShoppingCart" },
+  { name: "Customers", path: "/customers", icon: "Users" },
+  { name: "Reports", path: "/reports", icon: "BarChart" },
 ];
 
 // Reactive search query
-const searchQuery = ref('');
+const searchQuery = ref("");
 
 // Filter menu items based on search query
 const filteredMenuItems = computed(() => {
-  return menuItems.filter(item =>
+  return menuItems.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
+});
+
+
+
+//pie
+
+const chartCanvas = ref(null);
+const thisMonthTotal = ref(0);
+const previousMonthTotal = ref(0);
+
+// Load sales data from localStorage
+const loadSalesData = () => {
+  const storedData = localStorage.getItem("salesData");
+  return storedData ? JSON.parse(storedData) : null;
+};
+
+onMounted(() => {
+  const salesData = loadSalesData();
+
+  if (salesData && chartCanvas.value) {
+    // Current month sales data
+    const thisMonth = salesData.thisMonth;
+    const previousMonth = salesData.previousMonth;
+
+    // Calculate total sales for this month and previous month
+    thisMonthTotal.value = thisMonth.cashOnDelivery + thisMonth.mobilePayment + thisMonth.other;
+    previousMonthTotal.value = previousMonth.cashOnDelivery + previousMonth.mobilePayment + previousMonth.other;
+
+    // Pie chart data
+    const chartData = {
+      labels: ["Cash on Delivery", "Mobile Payment", "Other"],
+      datasets: [
+        {
+          data: [
+            thisMonth.cashOnDelivery,
+            thisMonth.mobilePayment,
+            thisMonth.other
+          ],
+          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+          hoverBackgroundColor: ["#FF4567", "#3B85D1", "#FFB84F"],
+        },
+      ],
+    };
+
+    // Create the pie chart
+    new Chart(chartCanvas.value, {
+      type: "pie",
+      data: chartData,
+      options: {
+        responsive: true,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (tooltipItem) => {
+                return `$${tooltipItem.raw.toLocaleString()}`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 });
 </script>
 
