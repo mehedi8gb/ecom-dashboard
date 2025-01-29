@@ -115,30 +115,24 @@
             </button>
           </router-link>
 
-          <template>
-            <div class="grid grid-cols-2 gap-6 mb-6">
-              <!-- Real-time Pie Chart with Sales Breakdown -->
-              <div class="col-span-2 bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="font-semibold mb-4">
-                  Sales Distribution for This Month
-                </h3>
-                <canvas ref="chartCanvas"></canvas>
+          <div class="grid grid-cols-2 gap-6 mb-6">
+            <!-- Real-time Pie Chart with Sales Breakdown -->
+            <div class="col-span-2 bg-white p-6 rounded-lg shadow-sm">
+              <h3 class="font-semibold mb-4">
+                Sales Distribution for This Month
+              </h3>
+              <canvas ref="chartCanvas"></canvas>
 
-                <div class="mt-4">
-                  <p>
-                    <strong>Total Sales for This Month:</strong> ${{
-                      thisMonthTotal
-                    }}
-                  </p>
-                  <p>
-                    <strong>Total Sales for Previous Month:</strong> ${{
-                      previousMonthTotal
-                    }}
-                  </p>
-                </div>
+              <div class="mt-4">
+                <p>
+                  <strong>Total Sales for This Month:</strong> ${{ thisMonthTotal }}
+                </p>
+                <p>
+                  <strong>Total Sales for Previous Month:</strong> ${{ previousMonthTotal }}
+                </p>
               </div>
             </div>
-          </template>
+          </div>
         </div>
       </div>
     </main>
@@ -146,41 +140,18 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { Menu, Plus, FileText, CheckCircle } from "lucide-vue-next";
 import { useRouter } from "vue-router";
-import { onMounted } from "vue";
 import Chart from "chart.js/auto";
 
 const router = useRouter();
 
 const stats = ref([]);
-
-onMounted(() => {
-  const storedStats = localStorage.getItem("stats");
-  stats.value = storedStats ? JSON.parse(storedStats) : [];
-});
-
 const categories = ref([]);
-
-onMounted(() => {
-  const storedCategories = localStorage.getItem("categories");
-  categories.value = storedCategories ? JSON.parse(storedCategories) : [];
-});
-
 const brands = ref([]);
-onMounted(() => {
-  const storedBrands = localStorage.getItem("brands");
-  brands.value = storedBrands ? JSON.parse(storedBrands) : [];
-});
-
 const menuItems = [
-  {
-    name: "Dashboard",
-    path: "/dashboard",
-    icon: "LayoutDashboard",
-    active: true,
-  },
+  { name: "Dashboard", path: "/dashboard", icon: "LayoutDashboard", active: true },
   { name: "POS System", path: "/pos-system", icon: "CreditCard" },
   { name: "Products", path: "/products", icon: "Package" },
   { name: "Orders", path: "/orders", icon: "ShoppingCart" },
@@ -190,57 +161,50 @@ const menuItems = [
 
 // Reactive search query
 const searchQuery = ref("");
-
-// Filter menu items based on search query
 const filteredMenuItems = computed(() => {
-  return menuItems.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
+  return menuItems.filter(item => item.name.toLowerCase().includes(searchQuery.value.toLowerCase()));
 });
 
-
-
-//pie
-
+// Sales Data
 const chartCanvas = ref(null);
 const thisMonthTotal = ref(0);
 const previousMonthTotal = ref(0);
 
-// Load sales data from localStorage
 const loadSalesData = () => {
   const storedData = localStorage.getItem("salesData");
   return storedData ? JSON.parse(storedData) : null;
 };
 
 onMounted(() => {
+  const storedStats = localStorage.getItem("stats");
+  stats.value = storedStats ? JSON.parse(storedStats) : [];
+
+  const storedCategories = localStorage.getItem("categories");
+  categories.value = storedCategories ? JSON.parse(storedCategories) : [];
+
+  const storedBrands = localStorage.getItem("brands");
+  brands.value = storedBrands ? JSON.parse(storedBrands) : [];
+
   const salesData = loadSalesData();
 
   if (salesData && chartCanvas.value) {
-    // Current month sales data
     const thisMonth = salesData.thisMonth;
     const previousMonth = salesData.previousMonth;
 
-    // Calculate total sales for this month and previous month
     thisMonthTotal.value = thisMonth.cashOnDelivery + thisMonth.mobilePayment + thisMonth.other;
     previousMonthTotal.value = previousMonth.cashOnDelivery + previousMonth.mobilePayment + previousMonth.other;
 
-    // Pie chart data
     const chartData = {
       labels: ["Cash on Delivery", "Mobile Payment", "Other"],
       datasets: [
         {
-          data: [
-            thisMonth.cashOnDelivery,
-            thisMonth.mobilePayment,
-            thisMonth.other
-          ],
+          data: [thisMonth.cashOnDelivery, thisMonth.mobilePayment, thisMonth.other],
           backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
           hoverBackgroundColor: ["#FF4567", "#3B85D1", "#FFB84F"],
         },
       ],
     };
 
-    // Create the pie chart
     new Chart(chartCanvas.value, {
       type: "pie",
       data: chartData,
@@ -249,9 +213,7 @@ onMounted(() => {
         plugins: {
           tooltip: {
             callbacks: {
-              label: (tooltipItem) => {
-                return `$${tooltipItem.raw.toLocaleString()}`;
-              },
+              label: (tooltipItem) => `$${tooltipItem.raw.toLocaleString()}`,
             },
           },
         },
