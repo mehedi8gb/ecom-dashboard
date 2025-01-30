@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-screen bg-gray-50">
     <!-- Sidebar -->
-    <aside class="w-64 bg-gray-900 text-white">
+    <aside class="w-0 sm:w-64 bg-gray-900 text-white hidden sm:block transition-all duration-300"> <!-- Line 6 -->
       <div class="p-4">
         <div class="flex items-center gap-2 text-xl font-bold">
           <div class="w-8 h-8 bg-red-500 rounded-lg"></div>
@@ -26,10 +26,9 @@
         </template>
       </nav>
     </aside>
-    <!--till this sidebar-->
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-auto">
+    <main class="flex-1 overflow-auto w-full transition-all duration-300"> <!-- Line 38 -->
       <!-- Header -->
       <header class="bg-white border-b">
         <div class="flex items-center justify-between px-6 py-4">
@@ -37,7 +36,7 @@
             <button class="p-2 hover:bg-gray-100 rounded-md">
               <Menu class="w-5 h-5" />
             </button>
-            <nav class="flex space-x-4">
+            <nav class="flex flex-wrap space-x-4"> <!-- Line 49 -->
               <router-link to="/dashboard" class="text-blue-500 border-b-2 border-blue-500 pb-4">Dashboard</router-link>
               <router-link to="/orders" class="text-gray-500 hover:text-gray-700">Orders</router-link>
               <router-link to="/preorders" class="text-gray-500 hover:text-gray-700">Preorders</router-link>
@@ -56,26 +55,22 @@
       <!-- Dashboard Content -->
       <div class="p-6">
         <!-- Stats Grid -->
-        <div class="grid grid-cols-4 gap-6 mb-6">
-          <!-- Total Customer -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6"> <!-- Line 82 -->
           <router-link v-if="stats.length > 0" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="text-4xl font-bold mb-1">{{ stats[0].value }}</h3>
             <p class="text-gray-500 text-sm">{{ stats[0].title }}</p>
           </router-link>
 
-          <!-- Total Products -->
           <router-link v-if="stats.length > 1" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="text-4xl font-bold mb-1">{{ stats[1].value }}</h3>
             <p class="text-gray-500 text-sm">{{ stats[1].title }}</p>
           </router-link>
 
-          <!-- Total Sales -->
           <router-link v-if="stats.length > 2" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="text-4xl font-bold mb-1">{{ stats[2].value }}</h3>
             <p class="text-gray-500 text-sm">{{ stats[2].title }}</p>
           </router-link>
 
-          <!-- Total Sellers -->
           <router-link v-if="stats.length > 3" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="text-4xl font-bold mb-1">{{ stats[3].value }}</h3>
             <p class="text-gray-500 text-sm">{{ stats[3].title }}</p>
@@ -83,7 +78,7 @@
         </div>
 
         <!-- Categories and Brands Section -->
-        <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6"> <!-- Line 112 -->
           <router-link to="/categories" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="font-semibold mb-4">Total Category</h3>
             <div class="space-y-3">
@@ -106,7 +101,7 @@
         </div>
 
         <!-- Orders Stats -->
-        <div class="grid grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"> <!-- Line 134 -->
           <router-link to="orders-stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="text-4xl font-bold text-purple-500 mb-2">153</h3>
             <p class="text-gray-500 mb-4">Total Order</p>
@@ -115,7 +110,7 @@
             </button>
           </router-link>
 
-          <div class="grid grid-cols-2 gap-6 mb-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
             <!-- Real-time Pie Chart with Sales Breakdown -->
             <div class="col-span-2 bg-white p-6 rounded-lg shadow-sm">
               <h3 class="font-semibold mb-4">
@@ -138,6 +133,7 @@
     </main>
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
