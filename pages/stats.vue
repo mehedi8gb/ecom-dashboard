@@ -8,7 +8,7 @@
 onMounted(() => {
   const stats = [
     { title: 'Total Customer', value: '1555' },
-    { title: 'Total Products', value: '178888' },
+    { title: 'Total Products', value: '17888888888' },
     { title: 'Total Sales', value: '6.999K' },
     { title: 'Total Sellers', value: '16600' },
   ];

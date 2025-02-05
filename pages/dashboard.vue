@@ -53,33 +53,36 @@
 
       <!-- Dashboard Content -->
       <div class="p-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          <router-link v-if="stats.length > 0" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
-            <h3 class="text-4xl font-bold mb-1">{{ stats[0].value }}</h3>
-            <p class="text-gray-500 text-sm">{{ stats[0].title }}</p>
-          </router-link>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+  
+    <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
+    <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Tcustomer }}</h3>
+    <p class="text-gray-500 text-sm"><b>Total Customers</b></p>
+    </div>
 
-          <router-link v-if="stats.length > 1" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
-            <h3 class="text-4xl font-bold mb-1">{{ stats[1].value }}</h3>
-            <p class="text-gray-500 text-sm">{{ stats[1].title }}</p>
-          </router-link>
+  <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
+    <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Tproduct }}</h3>
+    <p class="text-gray-500 text-sm"><b>Total Products</b></p>
+  </div>
 
-          <router-link v-if="stats.length > 2" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
-            <h3 class="text-4xl font-bold mb-1">{{ stats[2].value }}</h3>
-            <p class="text-gray-500 text-sm">{{ stats[2].title }}</p>
-          </router-link>
+  <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
+    <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Tbrands }}</h3>
+    <p class="text-gray-500 text-sm"><b>Total Brands</b></p>
+  </div>
 
-          <router-link v-if="stats.length > 3" to="/stats" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
-            <h3 class="text-4xl font-bold mb-1">{{ stats[3].value }}</h3>
-            <p class="text-gray-500 text-sm">{{ stats[3].title }}</p>
-          </router-link>
-        </div>
+  <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
+    <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Torder }}</h3>
+    <p class="text-gray-500 text-sm"><b>Total Orders</b></p>
+  </div>
+
+</div>
+
 
         <!-- Categories and Brands Section -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 " >
           <router-link to="/categories" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
-            <h3 class="font-semibold mb-4">Total Category</h3>
-            <div class="space-y-3">
+            <h3 class="font-semibold mb-4">Top Category</h3>
+            <div class="space-y-3 overflow-auto">
               <div v-for="category in categories" :key="category.name" class="flex justify-between">
                 <span>{{ category.name }}</span>
                 <span>${{ category.value.toLocaleString() }}</span>
@@ -87,9 +90,11 @@
             </div>
           </router-link>
 
+
+
           <router-link to="/brands" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="font-semibold mb-4">Top Brands</h3>
-            <div class="space-y-3">
+            <div class="space-y-3 overflow-auto">
               <div v-for="brand in brands" :key="brand.name" class="flex justify-between">
                 <span>{{ brand.name }}</span>
                 <span>${{ brand.value.toLocaleString() }}</span>
@@ -138,6 +143,10 @@ import { ref, computed, onMounted } from "vue";
 import { Menu, Plus, FileText, CheckCircle } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import Chart from "chart.js/auto";
+import { useStateStore } from '@/stores/useDataStore';
+
+const Storestats = useStateStore();
+
 
 const router = useRouter();
 
@@ -151,6 +160,7 @@ const menuItems = [
   { name: "Orders", path: "/orders", icon: "ShoppingCart" },
   { name: "Customers", path: "/customers", icon: "Users" },
   { name: "Reports", path: "/reports", icon: "BarChart" },
+  { name: "Product Category", path: "/categories", icon: "BarChart" },
 ];
 
 // Reactive search query
