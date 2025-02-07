@@ -27,20 +27,12 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="w-3/5 sm:flex-1 overflow-auto transition-all duration-300">
-      <!-- Header -->
-      <header class="bg-white border-b">
+    <div class="flex-1 overflow-auto transition-all duration-300">
+      <!-- Header (Sticky at Top, Outside of Main) -->
+      <header class="bg-white border-b sticky top-0 z-10">
         <div class="flex items-center justify-between px-6 py-4">
           <div class="flex items-center space-x-4">
-            <button class="p-2 hover:bg-gray-100 rounded-md">
-              <Menu class="w-5 h-5" />
-            </button>
-            <nav class="flex flex-wrap space-x-4">
-              <router-link to="/dashboard" class="text-blue-500 border-b-2 border-blue-500 pb-4">Dashboard</router-link>
-              <router-link to="/orders" class="text-gray-500 hover:text-gray-700">Orders</router-link>
-              <router-link to="/preorders" class="text-gray-500 hover:text-gray-700">Preorders</router-link>
-              <router-link to="/earnings" class="text-gray-500 hover:text-gray-700">Earnings</router-link>
-            </nav>
+            <!-- Add content if necessary -->
           </div>
           <div class="flex items-center space-x-4">
             <button class="text-blue-500 flex items-center">
@@ -52,34 +44,32 @@
       </header>
 
       <!-- Dashboard Content -->
-      <div class="p-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-  
-    <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
-    <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Tcustomer }}</h3>
-    <p class="text-gray-500 text-sm"><b>Total Customers</b></p>
-    </div>
+      <main class="p-4 mt-0.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <!-- Cards for Total Stats -->
+          <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
+            <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Tcustomer }}</h3>
+            <p class="text-gray-500 text-sm"><b>Total Customers</b></p>
+          </div>
 
-  <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
-    <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Tproduct }}</h3>
-    <p class="text-gray-500 text-sm"><b>Total Products</b></p>
-  </div>
+          <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
+            <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Tproduct }}</h3>
+            <p class="text-gray-500 text-sm"><b>Total Products</b></p>
+          </div>
 
-  <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
-    <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Tbrands }}</h3>
-    <p class="text-gray-500 text-sm"><b>Total Brands</b></p>
-  </div>
+          <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
+            <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Tbrands }}</h3>
+            <p class="text-gray-500 text-sm"><b>Active Cupon</b></p>
+          </div>
 
-  <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
-    <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Torder }}</h3>
-    <p class="text-gray-500 text-sm"><b>Total Orders</b></p>
-  </div>
-
-</div>
-
+          <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center">
+            <h3 class="text-4xl font-bold mb-1 overflow-auto">{{ Storestats.Torder }}</h3>
+            <p class="text-gray-500 text-sm"><b>Total Orders</b></p>
+          </div>
+        </div>
 
         <!-- Categories and Brands Section -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 " >
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 ">
           <router-link to="/categories" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="font-semibold mb-4">Top Category</h3>
             <div class="space-y-3 overflow-auto">
@@ -89,8 +79,6 @@
               </div>
             </div>
           </router-link>
-
-
 
           <router-link to="/brands" class="bg-white p-6 rounded-lg shadow-sm cursor-pointer">
             <h3 class="font-semibold mb-4">Top Brands</h3>
@@ -131,36 +119,39 @@
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 </template>
 
 
 
+
 <script setup>
+
+
 import { ref, computed, onMounted } from "vue";
-import { Menu, Plus, FileText, CheckCircle } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import Chart from "chart.js/auto";
 import { useStateStore } from '@/stores/useDataStore';
 
-const Storestats = useStateStore();
-
-
 const router = useRouter();
+
+// Initialize state from the store
+const Storestats = useStateStore();
 
 const stats = ref([]);
 const categories = ref([]);
 const brands = ref([]);
 const menuItems = [
   { name: "Dashboard", path: "/dashboard", icon: "LayoutDashboard", active: true },
-  { name: "POS System", path: "/pos-system", icon: "CreditCard" },
   { name: "Products", path: "/products", icon: "Package" },
   { name: "Orders", path: "/orders", icon: "ShoppingCart" },
-  { name: "Customers", path: "/customers", icon: "Users" },
+  { name: "Customers", path: "/customers", icon: "Package" },
   { name: "Reports", path: "/reports", icon: "BarChart" },
-  { name: "Product Category", path: "/categories", icon: "BarChart" },
+  { name: "Manage Shop", path: "/manageShop", icon: "BarChart" },
+  { name: "Cupon", path: "/cupon", icon: "BarChart" },
+  { name: "Invoicing", path: "/invoicing", icon: "BarChart" },
 ];
 
 // Reactive search query
@@ -225,8 +216,7 @@ onMounted(() => {
     });
   }
 });
+
 </script>
 
-<style scoped>
-/* Custom styles */
-</style>
+
