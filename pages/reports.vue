@@ -6,7 +6,7 @@
       <div class="p-2 sm:p-4">
         <div class="flex items-center gap-2 text-sm sm:text-xl font-bold">
           <div class="w-6 sm:w-8 h-6 sm:h-8 bg-red-500 rounded-lg"></div>
-          <span class="ml-3">ACTIVE<span class="text-red-500">ECOMMERCE</span></span>
+          <span class="ml-3">{{ shop.name ? shop.name + "'s" : 'ACTIVE' }}<span class="text-red-500">Platform</span></span>
         </div>
       </div>
 
@@ -25,6 +25,9 @@
           </router-link>
         </template>
       </nav>
+      <router-link to="/" class=" mx-7 py-80  text-red-500    text-left block">
+      Logout
+    </router-link>
     </aside>
 
     <!-- Main Content -->
@@ -36,11 +39,19 @@
             <!-- Add content if necessary -->
           </div>
           <div class="flex items-center space-x-4">
-            <button class="text-blue-500 flex items-center">
-              <Plus class="w-5 h-5 mr-1" />
-              Add New
-            </button>
-          </div>
+    <router-link to="/manageShop" class="w-9 h-9 rounded-full overflow-hidden cursor-pointer">
+      <img 
+        v-if="shop.logo" 
+        :src="shop.logo" 
+        alt="Shop Logo" 
+        class="w-full h-full object-cover" />
+      <img 
+        v-else 
+        src="/avatar-placeholder.png" 
+        alt="Default Logo" 
+        class="w-full h-full object-cover" />
+    </router-link>
+    </div>
         </div>
       </header>
        
@@ -167,6 +178,7 @@
 
 
 <script setup>
+import { ref, computed, onMounted, watch } from 'vue';
 
 const menuItems = [
   { name: "Dashboard", path: "/dashboard", icon: "LayoutDashboard", active: true },
@@ -177,6 +189,7 @@ const menuItems = [
   { name: "Manage Shop", path: "/manageShop", icon: "BarChart" },
   { name: "Cupon", path: "/cupon", icon: "BarChart" },
   { name: "Invoicing", path: "/invoicing", icon: "BarChart" },
+  { name: "Lucky Spin", path: "/luckyspin", icon: "BarChart" },
 ];
 
 // Reactive search query
@@ -185,80 +198,98 @@ const filteredMenuItems = computed(() => {
   return menuItems.filter(item => item.name.toLowerCase().includes(searchQuery.value.toLowerCase()));
 });
 
+const shop = ref({
+  name: "",
+  logo: "",
+});
 
-import { ref, computed } from 'vue'
-
-// Array to store the income for each day of the month (1 to 31)
-const income = ref(new Array(31).fill(0))  // 31 days in the month
-
-// Store previous month's sales, initialize to 0
-const previousMonthSales = ref(0)
-
-// Payment methods and their amounts
+const income = ref(new Array(31).fill(0));  // 31 days in the month
+const previousMonthSales = ref(0);
 const paymentMethods = ref([
   { name: 'Cash on Delivery', amount: 0, sum: 0 },
   { name: 'Mobile Pay', amount: 0, sum: 0 },
   { name: 'Cash on Store', amount: 0, sum: 0 },
-])
+]);
 
-// Function to format numbers to 2 decimal places
-const formatNumber = (value) => {
-  return value.toFixed(2)
-}
+const formatNumber = (value) => value.toFixed(2);
 
-// Calculate the total income for the month
-const totalIncome = computed(() => {
-  return income.value.reduce((sum, dailyIncome) => sum + dailyIncome, 0)
-})
+const totalIncome = computed(() => income.value.reduce((sum, dailyIncome) => sum + dailyIncome, 0));
 
-// Array representing days 1 to 31 of the month
-const daysInMonth = Array.from({ length: 31 }, (_, i) => i + 1)
+const daysInMonth = Array.from({ length: 31 }, (_, i) => i + 1);
 
-// Flag to handle the confirmation modal
-const showConfirmation = ref(false)
+const showConfirmation = ref(false);
 
-// Handle input event: if input is empty, set to 0
 const handleInput = (index) => {
   if (income.value[index] === "") {
-    income.value[index] = 0
+    income.value[index] = 0;
   }
 }
 
-// Handle input event for payment methods
-const handleInputPayment = (payment) => {
-  if (payment.amount === "") {
-    payment.amount = 0
-  }
-}
-
-// Add the entered payment amount to the corresponding sum
 const addPaymentAmount = (payment) => {
-  payment.sum += parseFloat(payment.amount)
-  payment.amount = 0 // Reset the input field after adding the amount
+  payment.sum += parseFloat(payment.amount);
+  payment.amount = 0;
 }
 
-// Reset the payment amount for the specific method
 const resetPaymentAmount = (payment) => {
-  payment.sum = 0
-  payment.amount = 0
+  payment.sum = 0;
+  payment.amount = 0;
 }
 
-// Function to store the total income as previous month's sales and reset the income
 const storeAsPreviousMonthSales = () => {
-  previousMonthSales.value = totalIncome.value // Store the total income as previous month's sales
-  income.value = new Array(31).fill(0) // Reset the income values for the new month
+  previousMonthSales.value = totalIncome.value;
+  income.value = new Array(31).fill(0);
   paymentMethods.value.forEach(payment => {
-    payment.sum = 0 // Reset all payment method sums
-  })
-  showConfirmation.value = false // Close the confirmation modal
+    payment.sum = 0;
+  });
+  showConfirmation.value = false;
+  saveDataToLocalStorage(); // Save data after storing sales
 }
 
 // Show the confirmation modal
 const confirmStoreAsPreviousMonthSales = () => {
-  showConfirmation.value = true
+  showConfirmation.value = true;
 }
 
+// Save data to localStorage
+const saveDataToLocalStorage = () => {
+  const salesData = [
+    { name: "Previous Month Sales", amount: previousMonthSales.value },
+    { name: "Total Income", amount: totalIncome.value },
+    { name: "Cash on Delivery Sum", amount: paymentMethods.value[0].sum },
+    { name: "Mobile Pay Sum", amount: paymentMethods.value[1].sum },
+    { name: "Cash on Store Sum", amount: paymentMethods.value[2].sum },
+  ];
+  localStorage.setItem("salesData", JSON.stringify(salesData.value));
+}
+
+// Automatically load data from localStorage when the component is mounted
+onMounted(() => {
+  const savedShop = localStorage.getItem("shopData");
+  if (savedShop) {
+    shop.value = JSON.parse(savedShop);
+  }
+
+  const savedTotalIncome = localStorage.getItem("totalIncome");
+  if (savedTotalIncome) {
+    totalIncome.value = JSON.parse(savedTotalIncome);
+  }
+
+  const savedPreviousMonthSales = localStorage.getItem("previousMonthSales");
+  if (savedPreviousMonthSales) {
+    previousMonthSales.value = JSON.parse(savedPreviousMonthSales);
+  }
+
+  const savedPaymentMethods = localStorage.getItem("paymentMethods");
+  if (savedPaymentMethods) {
+    paymentMethods.value = JSON.parse(savedPaymentMethods);
+  }
+});
+
+// Watch for changes to data and save them automatically to localStorage
+watch([shop, income, previousMonthSales, paymentMethods], saveDataToLocalStorage, { deep: true });
+
 </script>
+
 
 
 

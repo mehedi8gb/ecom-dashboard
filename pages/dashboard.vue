@@ -1,11 +1,14 @@
 <template>
   <div class="flex h-screen bg-gray-50">
     <!-- Sidebar -->
-    <aside class="w-2/5 sm:w-64 bg-gray-900 text-white transition-all duration-300 flex-shrink-0 overflow-auto"> 
+    <aside class="w-2/5 sm:w-64 bg-gray-900 text-white transition-all duration-300 flex-shrink-0 overflow-auto">
       <div class="p-2 sm:p-4">
         <div class="flex items-center gap-2 text-sm sm:text-xl font-bold">
           <div class="w-6 sm:w-8 h-6 sm:h-8 bg-red-500 rounded-lg"></div>
-          <span class="ml-3">ACTIVE<span class="text-red-500">ECOMMERCE</span></span>
+          <span class="ml-3">{{ shop.name ? shop.name + "'s" : 'ACTIVE' }}<span
+              class="text-red-500">Platform</span></span>
+
+
         </div>
       </div>
 
@@ -18,12 +21,22 @@
       <!-- Menu Items -->
       <nav class="mt-3 sm:mt-6">
         <template v-for="(item, index) in filteredMenuItems" :key="index">
-          <router-link :to="item.path" class="flex items-center px-2 sm:px-4 py-2 sm:py-3 text-gray-300 hover:bg-gray-800">
+          <router-link :to="item.path"
+            class="flex items-center px-2 sm:px-4 py-2 sm:py-3 text-gray-300 hover:bg-gray-800">
             <component :is="item.icon" class="w-5 h-5" />
             <span class="ml-3">{{ item.name }}</span>
           </router-link>
+
         </template>
+
       </nav>
+
+
+      <router-link to="/" class=" mx-7 py-80  text-red-500    text-left block">
+        Logout
+      </router-link>
+
+
     </aside>
 
     <!-- Main Content -->
@@ -35,10 +48,13 @@
             <!-- Add content if necessary -->
           </div>
           <div class="flex items-center space-x-4">
-            <button class="text-blue-500 flex items-center">
-              <Plus class="w-5 h-5 mr-1" />
-              Add New
-            </button>
+            <!-- Circle for logo image -->
+            <div class="flex items-center space-x-4">
+              <router-link to="/manageShop" class="w-9 h-9 rounded-full overflow-hidden cursor-pointer">
+                <img v-if="shop.logo" :src="shop.logo" alt="Shop Logo" class="w-full h-full object-cover" />
+                <img v-else src="/avatar-placeholder.png" alt="Default Logo" class="w-full h-full object-cover" />
+              </router-link>
+            </div>
           </div>
         </div>
       </header>
@@ -114,6 +130,7 @@
                 </p>
                 <p>
                   <strong>Total Sales for Previous Month:</strong> ${{ previousMonthTotal }}
+                  <p>{{ thisMonthSales  }} {{  previousMonthSales }}</p>
                 </p>
               </div>
             </div>
@@ -122,14 +139,13 @@
       </main>
     </div>
   </div>
+ 
 </template>
 
 
 
 
 <script setup>
-
-
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Chart from "chart.js/auto";
@@ -143,6 +159,39 @@ const Storestats = useStateStore();
 const stats = ref([]);
 const categories = ref([]);
 const brands = ref([]);
+
+
+// Initialize reactive variables for sales data
+const thisMonthSales = ref(0);
+const previousMonthSales = ref(0);
+const cashOnDelivery = ref(0);
+const cashOnStore = ref(0);
+const mobilePayment = ref(0);
+
+const loadSalesData = () => {
+  const storedData = localStorage.getItem("salesData");
+  return storedData ? JSON.parse(storedData) : null;
+};
+
+// On component mount, load and store the data
+onMounted(() => {
+  const salesData = loadSalesData();
+  
+  if (salesData) {
+    const thisMonth = salesData.thisMonth;
+    const previousMonth = salesData.previousMonth;
+
+    // Store the sales data in separate variables
+    thisMonthSales.value = thisMonth.total || 0;
+    previousMonthSales.value = previousMonth.total || 0;
+
+    cashOnDelivery.value = thisMonth.cashOnDelivery || 0;
+    cashOnStore.value = thisMonth.cashOnStore || 0;
+    mobilePayment.value = thisMonth.mobilePayment || 0;
+  }
+});
+
+
 const menuItems = [
   { name: "Dashboard", path: "/dashboard", icon: "LayoutDashboard", active: true },
   { name: "Products", path: "/products", icon: "Package" },
@@ -152,7 +201,12 @@ const menuItems = [
   { name: "Manage Shop", path: "/manageShop", icon: "BarChart" },
   { name: "Cupon", path: "/cupon", icon: "BarChart" },
   { name: "Invoicing", path: "/invoicing", icon: "BarChart" },
+  { name: "Lucky Spin", path: "/luckyspin", icon: "BarChart" },
 ];
+
+// Initialize shop as a reactive object
+const shop = ref({ logo: null });
+const shopUrl = ref("");
 
 // Reactive search query
 const searchQuery = ref("");
@@ -160,25 +214,31 @@ const filteredMenuItems = computed(() => {
   return menuItems.filter(item => item.name.toLowerCase().includes(searchQuery.value.toLowerCase()));
 });
 
+onMounted(() => {
+  // Load shop data from localStorage
+  const savedShop = localStorage.getItem("shopData");
+  if (savedShop) {
+    shop.value = JSON.parse(savedShop); // Populate shop data from localStorage
+  }
+  shopUrl.value = window.location.origin + "/shop"; // Adjust shop page link
+});
+
 // Sales Data
 const chartCanvas = ref(null);
 const thisMonthTotal = ref(0);
 const previousMonthTotal = ref(0);
 
-const loadSalesData = () => {
+/*const loadSalesData = () => {
   const storedData = localStorage.getItem("salesData");
   return storedData ? JSON.parse(storedData) : null;
-};
+};*/
 
 onMounted(() => {
-  const storedStats = localStorage.getItem("stats");
-  stats.value = storedStats ? JSON.parse(storedStats) : [];
 
-  const storedCategories = localStorage.getItem("categories");
-  categories.value = storedCategories ? JSON.parse(storedCategories) : [];
 
-  const storedBrands = localStorage.getItem("brands");
-  brands.value = storedBrands ? JSON.parse(storedBrands) : [];
+  
+
+  
 
   const salesData = loadSalesData();
 
@@ -186,14 +246,14 @@ onMounted(() => {
     const thisMonth = salesData.thisMonth;
     const previousMonth = salesData.previousMonth;
 
-    thisMonthTotal.value = thisMonth.cashOnDelivery + thisMonth.mobilePayment + thisMonth.other;
-    previousMonthTotal.value = previousMonth.cashOnDelivery + previousMonth.mobilePayment + previousMonth.other;
+    thisMonthTotal.value = thisMonthSales;
+    previousMonthTotal.value = previousMonthSales;
 
     const chartData = {
       labels: ["Cash on Delivery", "Mobile Payment", "Other"],
       datasets: [
         {
-          data: [thisMonth.cashOnDelivery, thisMonth.mobilePayment, thisMonth.other],
+          data: [thisMonth.cashOnDelivery, thisMonth.mobilePayment, thisMonth.cashOnStore],
           backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
           hoverBackgroundColor: ["#FF4567", "#3B85D1", "#FFB84F"],
         },
@@ -216,7 +276,4 @@ onMounted(() => {
     });
   }
 });
-
 </script>
-
-

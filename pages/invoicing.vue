@@ -6,7 +6,7 @@
       <div class="p-2 sm:p-4">
         <div class="flex items-center gap-2 text-sm sm:text-xl font-bold">
           <div class="w-6 sm:w-8 h-6 sm:h-8 bg-red-500 rounded-lg"></div>
-          <span class="ml-3">ACTIVE<span class="text-red-500">ECOMMERCE</span></span>
+          <span class="ml-3">{{ shop.name ? shop.name + "'s" : 'ACTIVE' }}<span class="text-red-500">Platform</span></span>
         </div>
       </div>
 
@@ -25,6 +25,9 @@
           </router-link>
         </template>
       </nav>
+      <router-link to="/" class=" mx-7 py-80  text-red-500    text-left block">
+      Logout
+    </router-link>
     </aside>
 
     <!-- Main Content -->
@@ -36,11 +39,19 @@
             <!-- Add content if necessary -->
           </div>
           <div class="flex items-center space-x-4">
-            <button class="text-blue-500 flex items-center">
-              <Plus class="w-5 h-5 mr-1" />
-              Add New
-            </button>
-          </div>
+    <router-link to="/manageShop" class="w-9 h-9 rounded-full overflow-hidden cursor-pointer">
+      <img 
+        v-if="shop.logo" 
+        :src="shop.logo" 
+        alt="Shop Logo" 
+        class="w-full h-full object-cover" />
+      <img 
+        v-else 
+        src="/avatar-placeholder.png" 
+        alt="Default Logo" 
+        class="w-full h-full object-cover" />
+    </router-link>
+    </div>
         </div>
       </header>
        
@@ -209,6 +220,7 @@ const menuItems = [
   { name: "Manage Shop", path: "/manageShop", icon: "BarChart" },
   { name: "Cupon", path: "/cupon", icon: "BarChart" },
   { name: "Invoicing", path: "/invoicing", icon: "BarChart" },
+  { name: "Lucky Spin", path: "/luckyspin", icon: "BarChart" },
 ];
 
 
@@ -217,6 +229,20 @@ const searchQuery = ref("");
 const filteredMenuItems = computed(() => {
   return menuItems.filter(item => item.name.toLowerCase().includes(searchQuery.value.toLowerCase()));
 });
+
+const shop = ref({
+  name: "", 
+  logo: "",
+  // Add other properties here as needed
+});
+
+onMounted(() => {
+  const savedShop = localStorage.getItem("shopData");
+  if (savedShop) {
+    shop.value = JSON.parse(savedShop); // Populate shop data from localStorage
+  }
+});
+
 
 
 import { ref, computed } from 'vue';

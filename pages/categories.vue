@@ -65,6 +65,7 @@ const menuItems = [
   { name: "Manage Shop", path: "/manageShop", icon: "BarChart" },
   { name: "Cupon", path: "/cupon", icon: "BarChart" },
   { name: "Invoicing", path: "/invoicing", icon: "BarChart" },
+  { name: "Lucky Spin", path: "/luckyspin", icon: "BarChart" },
 ];
 
 // Reactive search query
